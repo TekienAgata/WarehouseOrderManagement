@@ -77,7 +77,9 @@ def login():
     try:
         data = request.get_json()
         if not data or not data.get("username") or not data.get("password"):
-            return make_response(jsonify({"error": "Invalid input"}), 400)
+            return make_response(
+                jsonify({"error": "Nieprawidłowe dane logowania"}), 400
+            )
 
         user = models.User.query.filter_by(username=data["username"]).first()
         if user and check_password_hash(user.password, data["password"]):
@@ -87,7 +89,7 @@ def login():
             return (
                 jsonify(
                     {
-                        "message": "Login successful",
+                        "message": "Logowanie udane",
                         "access_token": access_token,
                         "is_admin": user.is_admin,
                     }
@@ -95,7 +97,7 @@ def login():
                 200,
             )
 
-        return make_response(jsonify({"error": "Invalid credentials"}), 401)
+        return make_response(jsonify({"error": "Nieprawidłowe dane logowania"}), 401)
     except Exception as e:
         return make_response(jsonify({"error": str(e)}), 500)
 
@@ -115,30 +117,30 @@ def create_product():
     try:
         current_user = get_jwt_identity()
         if not current_user["is_admin"]:
-            return make_response(jsonify({"error": "Access forbidden"}), 403)
+            return make_response(jsonify({"error": "Dostęp zabroniony"}), 403)
 
         data = request.get_json()
         required_fields = ["name", "price", "stock", "warehouse_id"]
         if not all(field in data for field in required_fields):
-            return make_response(jsonify({"error": "Missing required fields"}), 400)
+            return make_response(jsonify({"error": "Brakujące wymagane pola"}), 400)
 
         product = models.Product(
             name=data["name"],
             description=data.get("description", ""),
-            price=data["price"],
-            stock=data["stock"],
-            warehouse_id=data["warehouse_id"],
+            price=float(data["price"]),
+            stock=int(data["stock"]),
+            warehouse_id=int(data["warehouse_id"]),
         )
+
         models.db.session.add(product)
         models.db.session.commit()
 
         return (
-            jsonify(
-                {"message": "Product created successfully", "product": product.json()}
-            ),
+            jsonify({"message": "Produkt dodany pomyślnie", "product": product.json()}),
             201,
         )
     except Exception as e:
+        models.db.session.rollback()
         return make_response(jsonify({"error": str(e)}), 500)
 
 
@@ -148,7 +150,7 @@ def create_order():
         data = request.get_json()
         required_fields = ["customer_name", "customer_email", "products"]
         if not all(field in data for field in required_fields):
-            return make_response(jsonify({"error": "Missing required fields"}), 400)
+            return make_response(jsonify({"error": "Brakujące wymagane pola"}), 400)
 
         total_price = 0
         order_items = []
@@ -157,17 +159,20 @@ def create_order():
             if not isinstance(item, dict) or not all(
                 k in item for k in ["product_id", "quantity"]
             ):
-                return make_response(jsonify({"error": "Invalid product format"}), 400)
+                return make_response(
+                    jsonify({"error": "Nieprawidłowy format produktu"}), 400
+                )
 
             product = models.Product.query.get(item["product_id"])
             if not product:
                 return make_response(
-                    jsonify({"error": f"Product {item['product_id']} not found"}), 400
+                    jsonify({"error": f"Produkt {item['product_id']} nie znaleziony"}),
+                    400,
                 )
             if product.stock < item["quantity"]:
                 return make_response(
                     jsonify(
-                        {"error": f"Insufficient stock for product {product.name}"}
+                        {"error": f"Niewystarczająca ilość produktu {product.name}"}
                     ),
                     400,
                 )
@@ -194,7 +199,7 @@ def create_order():
         models.db.session.commit()
 
         return (
-            jsonify({"message": "Order created successfully", "order": order.json()}),
+            jsonify({"message": "Zamówienie złożone pomyślnie", "order": order.json()}),
             201,
         )
     except Exception as e:
@@ -208,9 +213,9 @@ def get_orders():
     try:
         current_user = get_jwt_identity()
         if not current_user["is_admin"]:
-            return make_response(jsonify({"error": "Access forbidden"}), 403)
+            return make_response(jsonify({"error": "Dostęp zabroniony"}), 403)
 
-        orders = models.Order.query.all()
+        orders = models.Order.query.order_by(models.Order.created_at.desc()).all()
         return jsonify({"orders": [order.json() for order in orders]}), 200
     except Exception as e:
         return make_response(jsonify({"error": str(e)}), 500)

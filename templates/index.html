@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Warehouse and Order Management</title>
+    <title>System Zarządzania Magazynem</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -114,56 +114,87 @@
         .cart-button:hover {
             background-color: #218838;
         }
+        .orders-section {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        .order-item {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            background-color: white;
+        }
+        .order-details {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+        .order-status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 3px;
+            margin-left: 10px;
+        }
+        .status-pending {
+            background-color: #ffeeba;
+            color: #856404;
+        }
+        .status-shipped {
+            background-color: #d4edda;
+            color: #155724;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div id="userInfo"></div>
-        <h1>Warehouse and Order Management System</h1>
+        <h1>System Zarządzania Magazynem i Zamówieniami</h1>
         
         <!-- Authentication Section -->
         <div id="authSection" class="auth-section">
             <!-- Registration Form -->
             <form id="registerForm" class="auth-form">
-                <h2>Register</h2>
+                <h2>Rejestracja</h2>
                 <div class="form-group">
-                    <label for="regUsername">Username</label>
-                    <input type="text" id="regUsername" required minlength="3" maxlength="50" pattern="[a-zA-Z0-9_-]+" title="Username can only contain letters, numbers, underscores and hyphens">
+                    <label for="regUsername">Nazwa użytkownika</label>
+                    <input type="text" id="regUsername" required minlength="3" maxlength="50" pattern="[a-zA-Z0-9_-]+" title="Nazwa użytkownika może zawierać tylko litery, cyfry, podkreślenia i myślniki">
                 </div>
                 <div class="form-group">
-                    <label for="regPassword">Password</label>
-                    <input type="password" id="regPassword" required minlength="6" title="Password must be at least 6 characters long">
+                    <label for="regPassword">Hasło</label>
+                    <input type="password" id="regPassword" required minlength="6" title="Hasło musi mieć co najmniej 6 znaków">
                 </div>
-                <button type="submit" class="btn">Register</button>
+                <button type="submit" class="btn">Zarejestruj</button>
             </form>
 
             <!-- Login Form -->
             <form id="loginForm" class="auth-form">
-                <h2>Login</h2>
+                <h2>Logowanie</h2>
                 <div class="form-group">
-                    <label for="loginUsername">Username</label>
+                    <label for="loginUsername">Nazwa użytkownika</label>
                     <input type="text" id="loginUsername" required>
                 </div>
                 <div class="form-group">
-                    <label for="loginPassword">Password</label>
+                    <label for="loginPassword">Hasło</label>
                     <input type="password" id="loginPassword" required>
                 </div>
-                <button type="submit" class="btn">Login</button>
+                <button type="submit" class="btn">Zaloguj</button>
             </form>
         </div>
 
         <!-- Products Section -->
         <div class="products-section">
-            <h2>Available Products</h2>
+            <h2>Dostępne Produkty</h2>
             <div id="productsGrid" class="products-grid"></div>
         </div>
 
         <!-- Order Form -->
         <div id="orderForm" class="order-form">
-            <h2>Place Order</h2>
+            <h2>Złóż Zamówienie</h2>
             <form id="placeOrderForm">
                 <div class="form-group">
-                    <label for="customerName">Full Name</label>
+                    <label for="customerName">Imię i Nazwisko</label>
                     <input type="text" id="customerName" required minlength="2" maxlength="100">
                 </div>
                 <div class="form-group">
@@ -171,45 +202,60 @@
                     <input type="email" id="customerEmail" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
                 </div>
                 <div id="orderItems"></div>
-                <button type="submit" class="btn">Place Order</button>
+                <button type="submit" class="btn">Złóż Zamówienie</button>
             </form>
         </div>
 
         <!-- Admin Section -->
-        <div id="adminSection" class="admin-section">
-            <h2>Admin Panel</h2>
+        <div id="adminSection" class="admin-section" style="display: none;">
+            <h2>Panel Administratora</h2>
+            
+            <!-- Add Product Form -->
             <form id="addProductForm">
+                <h3>Dodaj Nowy Produkt</h3>
                 <div class="form-group">
-                    <label for="productName">Product Name</label>
+                    <label for="productName">Nazwa Produktu</label>
                     <input type="text" id="productName" required minlength="2" maxlength="255">
                 </div>
                 <div class="form-group">
-                    <label for="productDescription">Description</label>
+                    <label for="productDescription">Opis</label>
                     <textarea id="productDescription" rows="3"></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="productPrice">Price</label>
+                    <label for="productPrice">Cena</label>
                     <input type="number" id="productPrice" required min="0.01" step="0.01">
                 </div>
                 <div class="form-group">
-                    <label for="productStock">Stock</label>
+                    <label for="productStock">Stan Magazynowy</label>
                     <input type="number" id="productStock" required min="0">
                 </div>
                 <div class="form-group">
-                    <label for="warehouseId">Warehouse</label>
+                    <label for="warehouseId">Magazyn</label>
                     <select id="warehouseId" required>
-                        <option value="1">Main Warehouse</option>
+                        <option value="1">Magazyn Główny</option>
                     </select>
                 </div>
-                <button type="submit" class="btn">Add Product</button>
+                <button type="submit" class="btn">Dodaj Produkt</button>
             </form>
+
+            <!-- Orders List Section -->
+            <div class="orders-section">
+                <h3>Lista Zamówień</h3>
+                <div id="ordersList">
+                    <!-- Orders will be loaded here -->
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
         let token = localStorage.getItem('token');
         let isAdmin = localStorage.getItem('isAdmin') === 'true';
-        const cart = new Map();
+        let cart = new Map();
+
+        // Add console logging for debugging
+        console.log('Initial token:', token);
+        console.log('Initial isAdmin:', isAdmin);
 
         function updateAuthUI() {
             const authSection = document.getElementById('authSection');
@@ -221,10 +267,12 @@
                 authSection.style.display = 'none';
                 orderForm.style.display = 'block';
                 userInfo.innerHTML = `
-                    <button onclick="logout()" class="btn">Logout</button>
+                    <button onclick="logout()" class="btn">Wyloguj</button>
                 `;
-                if (isAdmin) {
+                
+                if (isAdmin === true || isAdmin === 'true') {
                     adminSection.style.display = 'block';
+                    loadOrders();
                 } else {
                     adminSection.style.display = 'none';
                 }
@@ -252,10 +300,10 @@
                 if (response.ok) {
                     token = data.access_token;
                     localStorage.setItem('token', token);
-                    alert('Registration successful!');
+                    alert('Rejestracja zakończona pomyślnie!');
                     updateAuthUI();
                 } else {
-                    alert(data.error);
+                    alert(data.error || 'Błąd podczas rejestracji');
                 }
             } catch (error) {
                 alert('Error during registration');
@@ -280,13 +328,16 @@
                     isAdmin = data.is_admin;
                     localStorage.setItem('token', token);
                     localStorage.setItem('isAdmin', isAdmin);
-                    alert('Login successful!');
+                    alert('Logowanie udane!');
+                    document.getElementById('loginForm').reset();
                     updateAuthUI();
+                    loadProducts();
                 } else {
-                    alert(data.error);
+                    alert(data.error || 'Błąd podczas logowania');
                 }
             } catch (error) {
-                alert('Error during login');
+                console.error('Error:', error);
+                alert('Błąd podczas logowania');
             }
         });
 
@@ -303,21 +354,21 @@
                     productCard.className = 'product-card';
                     productCard.innerHTML = `
                         <h3>${product.name}</h3>
-                        <p>${product.description || 'No description available'}</p>
-                        <p>Price: $${product.price}</p>
-                        <p>Stock: ${product.stock}</p>
+                        <p>${product.description || 'Brak opisu'}</p>
+                        <p>Cena: ${product.price} zł</p>
+                        <p>Stan magazynowy: ${product.stock}</p>
                         <div class="form-group">
-                            <label>Quantity:</label>
+                            <label>Ilość:</label>
                             <input type="number" min="1" max="${product.stock}" value="1" class="quantity-input">
                         </div>
                         <button onclick="addToCart(${product.id}, this.parentElement)" class="cart-button">
-                            Add to Cart
+                            Dodaj do Koszyka
                         </button>
                     `;
                     productsGrid.appendChild(productCard);
                 });
             } catch (error) {
-                alert('Error loading products');
+                alert('Błąd podczas ładowania produktów');
             }
         }
 
@@ -326,24 +377,24 @@
             const quantity = parseInt(quantityInput.value);
             cart.set(productId, quantity);
             updateOrderItems();
-            alert('Product added to cart!');
+            alert('Produkt dodany do koszyka!');
         }
 
         function updateOrderItems() {
             const orderItems = document.getElementById('orderItems');
             if (!orderItems) return;
             
-            orderItems.innerHTML = '<h3>Cart Items</h3>';
+            orderItems.innerHTML = '<h3>Koszyk</h3>';
             if (cart.size === 0) {
-                orderItems.innerHTML += '<p>Cart is empty</p>';
+                orderItems.innerHTML += '<p>Koszyk jest pusty</p>';
                 return;
             }
 
             cart.forEach((quantity, productId) => {
                 orderItems.innerHTML += `
                     <div class="cart-item">
-                        <p>Product ID: ${productId}, Quantity: ${quantity}</p>
-                        <button onclick="removeFromCart(${productId})" class="btn">Remove</button>
+                        <p>Produkt ID: ${productId}, Ilość: ${quantity}</p>
+                        <button onclick="removeFromCart(${productId})" class="btn">Usuń</button>
                     </div>
                 `;
             });
@@ -358,7 +409,7 @@
         document.getElementById('placeOrderForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (cart.size === 0) {
-                alert('Please add items to your cart');
+                alert('Proszę dodać produkty do koszyka');
                 return;
             }
 
@@ -379,12 +430,15 @@
                 });
                 const data = await response.json();
                 if (response.ok) {
-                    alert('Order placed successfully!');
+                    alert('Zamówienie złożone pomyślnie!');
                     cart.clear();
                     updateOrderItems();
                     loadProducts();
+                    if (isAdmin) {
+                        loadOrders();
+                    }
                 } else {
-                    alert(data.error);
+                    alert(data.error || 'Błąd podczas składania zamówienia');
                 }
             } catch (error) {
                 alert('Error placing order');
@@ -394,36 +448,48 @@
         // Add product (admin only)
         document.getElementById('addProductForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            console.log('Add Product - Token:', token);
+            console.log('Add Product - IsAdmin:', isAdmin);
+            
             if (!token || !isAdmin) {
-                alert('Admin access required');
+                alert('Wymagany dostęp administratora');
                 return;
             }
 
             try {
+                const productData = {
+                    name: document.getElementById('productName').value,
+                    description: document.getElementById('productDescription').value,
+                    price: parseFloat(document.getElementById('productPrice').value),
+                    stock: parseInt(document.getElementById('productStock').value),
+                    warehouse_id: parseInt(document.getElementById('warehouseId').value)
+                };
+                
+                console.log('Sending product data:', productData);
+                
                 const response = await fetch('/api/products', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify({
-                        name: document.getElementById('productName').value,
-                        description: document.getElementById('productDescription').value,
-                        price: parseFloat(document.getElementById('productPrice').value),
-                        stock: parseInt(document.getElementById('productStock').value),
-                        warehouse_id: parseInt(document.getElementById('warehouseId').value)
-                    })
+                    body: JSON.stringify(productData)
                 });
+
+                console.log('Product response:', response);
                 const data = await response.json();
+                console.log('Product data:', data);
+
                 if (response.ok) {
-                    alert('Product added successfully!');
-                    loadProducts();
+                    alert('Produkt dodany pomyślnie!');
                     document.getElementById('addProductForm').reset();
+                    loadProducts();
                 } else {
-                    alert(data.error);
+                    alert(data.error || 'Błąd podczas dodawania produktu');
                 }
             } catch (error) {
-                alert('Error adding product');
+                console.error('Error in addProduct:', error);
+                alert(`Błąd podczas dodawania produktu: ${error.message}`);
             }
         });
 
@@ -435,6 +501,65 @@
             cart.clear();
             updateAuthUI();
             updateOrderItems();
+        }
+
+        // Load orders
+        async function loadOrders() {
+            console.log('LoadOrders - Token:', token);
+            console.log('LoadOrders - IsAdmin:', isAdmin);
+            
+            if (!token || !isAdmin) {
+                console.log('LoadOrders - No token or not admin');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/orders', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                console.log('Orders response:', response);
+                const data = await response.json();
+                console.log('Orders data:', data);
+                
+                const ordersList = document.getElementById('ordersList');
+                if (!response.ok) {
+                    console.error('Error loading orders:', data.error);
+                    ordersList.innerHTML = `<p class="error">Błąd podczas ładowania zamówień: ${data.error}</p>`;
+                    return;
+                }
+
+                if (data.orders.length === 0) {
+                    ordersList.innerHTML = '<p>Brak zamówień</p>';
+                    return;
+                }
+
+                ordersList.innerHTML = data.orders.map(order => `
+                    <div class="order-item">
+                        <h3>Zamówienie #${order.id}</h3>
+                        <p>Klient: ${order.customer_name}</p>
+                        <p>Email: ${order.customer_email}</p>
+                        <p>Data: ${new Date(order.created_at).toLocaleString('pl-PL')}</p>
+                        <p>Suma: ${order.total_price.toFixed(2)} zł
+                            <span class="order-status ${order.shipped ? 'status-shipped' : 'status-pending'}">
+                                ${order.shipped ? 'Wysłane' : 'Oczekujące'}
+                            </span>
+                        </p>
+                        <div class="order-details">
+                            <h4>Produkty:</h4>
+                            ${order.items.map(item => `
+                                <p>${item.product_name} - Ilość: ${item.quantity}, 
+                                   Cena: ${item.price.toFixed(2)} zł</p>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error in loadOrders:', error);
+                document.getElementById('ordersList').innerHTML = 
+                    `<p class="error">Błąd podczas ładowania zamówień: ${error.message}</p>`;
+            }
         }
 
         // Initialize

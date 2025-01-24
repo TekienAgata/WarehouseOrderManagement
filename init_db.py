@@ -6,6 +6,7 @@ def init_db():
     with app.app_context():
         models.db.create_all()
 
+        # Create admin user if not exists
         if not models.User.query.filter_by(username="admin").first():
             admin = models.User(
                 username="admin",
@@ -14,9 +15,10 @@ def init_db():
             )
             models.db.session.add(admin)
 
-        warehouse = models.Warehouse.query.filter_by(name="Main Warehouse").first()
+        # Create main warehouse if not exists
+        warehouse = models.Warehouse.query.filter_by(name="Magazyn Główny").first()
         if not warehouse:
-            warehouse = models.Warehouse(name="Main Warehouse", location="123 Main St")
+            warehouse = models.Warehouse(name="Magazyn Główny", location="ul. Główna 1")
             models.db.session.add(warehouse)
             models.db.session.commit()
 
